@@ -1,0 +1,14 @@
+server:
+  http:
+    addr: 0.0.0.0:8080
+    timeout: 2000s
+data:
+  database:
+    driver: mysql
+    source: free_testuser:fr5Bo7kTetuK@tcp(rm-uf6b86e0rc52d5k9iqo.mysql.rds.aliyuncs.com:3306)/pixiu?charset=utf8
+  redis:
+    addr: r-uf6nhnheioue6q7vhspd.redis.rds.aliyuncs.com:6379
+    pass: pAjb8N7Y2Xpv2gH3m3H
+    db: 0
+    read_timeout: 2s
+    write_timeout: 2s
