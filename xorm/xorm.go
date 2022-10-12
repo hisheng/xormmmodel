@@ -6,7 +6,6 @@ package xorm
 import (
 	"database/sql"
 	"fmt"
-
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -77,7 +76,7 @@ func initTableStruct(mysqlDb *sql.DB) {
 		}
 		defaultValueString := ""
 		if defaultValue != nil {
-			defaultValueString = fmt.Sprintf("default('%v')", defaultValue)
+			defaultValueString = fmt.Sprintf("default('%s')", defaultValue)
 		}
 
 		_type, ok := typeForMysqlToGo[dataType]
