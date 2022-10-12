@@ -60,7 +60,7 @@ func initTableStruct(mysqlDb *sql.DB) {
 		tableName := ""
 		columnComment := ""
 		columnType := ""
-		defaultValue := ""
+		var defaultValue interface{}
 		err = columns.Scan(&columnName, &dataType, &isNullable, &tableName, &columnComment, &columnType, &defaultValue)
 		if err != nil {
 			fmt.Println(err)
@@ -75,19 +75,16 @@ func initTableStruct(mysqlDb *sql.DB) {
 			comment += columnComment
 			comment += "')"
 		}
-
-		defaultV := ""
-		if len(defaultValue) > 0 {
-			defaultV = "default('"
-			defaultV += defaultValue
-			defaultV += "')"
+		defaultValueString := ""
+		if defaultValue != nil {
+			defaultValueString = fmt.Sprintf("default('%v')", defaultValue)
 		}
 
 		_type, ok := typeForMysqlToGo[dataType]
 		if !ok {
 			_type = "[]byte"
 		}
-		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s\"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, defaultV, comment)
+		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s\"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, defaultValueString, comment)
 		structStrArr = append(structStrArr, rowXorm)
 	}
 	saveToFile(xormTable, structStrArr)
