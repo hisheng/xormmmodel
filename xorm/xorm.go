@@ -46,7 +46,7 @@ func InitStruct(xormDsn string, table string) {
 }
 
 func initTableStruct(mysqlDb *sql.DB) {
-	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE FROM information_schema.COLUMNS WHERE table_schema=DATABASE () AND table_name=?;", xormTable)
+	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE ,COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE table_schema=DATABASE () AND table_name=?;", xormTable)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -60,15 +60,35 @@ func initTableStruct(mysqlDb *sql.DB) {
 		tableName := ""
 		columnComment := ""
 		columnType := ""
-		err = columns.Scan(&columnName, &dataType, &isNullable, &tableName, &columnComment, &columnType)
+		defaultValue := ""
+		err = columns.Scan(&columnName, &dataType, &isNullable, &tableName, &columnComment, &columnType, &defaultValue)
+		fmt.Println(columnName, dataType, isNullable, tableName, columnComment, columnType, defaultValue)
 		if err != nil {
 			fmt.Println(err)
 		}
+		null := "not null"
+		if isNullable == "YES" {
+			null = "null"
+		}
+		comment := ""
+		if len(columnComment) > 0 {
+			comment = "comment('"
+			comment += columnComment
+			comment += "')"
+		}
+
+		defaultV := ""
+		if len(defaultValue) > 0 {
+			defaultV = "default('"
+			defaultV += defaultValue
+			defaultV += "')"
+		}
+
 		_type, ok := typeForMysqlToGo[dataType]
 		if !ok {
 			_type = "[]byte"
 		}
-		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s\"` //%s \n", upperCamelCase(columnName), _type, columnName, columnType, columnComment)
+		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s\"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, defaultV, comment)
 		structStrArr = append(structStrArr, rowXorm)
 	}
 	saveToFile(xormTable, structStrArr)
@@ -111,4 +131,5 @@ var typeForMysqlToGo = map[string]string{
 	"decimal":            "float64",
 	"binary":             "string",
 	"varbinary":          "string",
+	"json":               "string",
 }
