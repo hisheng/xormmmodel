@@ -62,7 +62,6 @@ func initTableStruct(mysqlDb *sql.DB) {
 		columnType := ""
 		defaultValue := ""
 		err = columns.Scan(&columnName, &dataType, &isNullable, &tableName, &columnComment, &columnType, &defaultValue)
-		fmt.Println(columnName, dataType, isNullable, tableName, columnComment, columnType, defaultValue)
 		if err != nil {
 			fmt.Println(err)
 		}
