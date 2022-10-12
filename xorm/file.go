@@ -44,7 +44,11 @@ func saveToFile(tableName string, structStrArr []string) {
 	}
 	structStr += "} \n"
 	fileStr += structStr
+
+	//2 TableName
+	tbStr := fmt.Sprintf("func (m *%s) TableName() string { \n return \"%s\" \n }\n", upperCamelCase(tableName), tableName)
 	//fmt.Println(fileStr)
+	fileStr += tbStr
 	saveFile(tableName, fileStr)
 
 }
