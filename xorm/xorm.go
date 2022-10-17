@@ -45,11 +45,19 @@ func InitStruct(xormDsn string, table string) {
 }
 
 func initTableStruct(mysqlDb *sql.DB) {
-	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE ,COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE table_schema=DATABASE () AND table_name=?;", xormTable)
+	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE ,COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=?;", xormTable)
 	if err != nil {
 		fmt.Println(err)
 	}
 	defer columns.Close()
+
+	row := mysqlDb.QueryRow("SELECT k.column_name FROM information_schema.table_constraints t JOIN information_schema.key_column_usage k USING(constraint_name,table_schema,table_name) WHERE t.constraint_type='PRIMARY KEY' AND t.table_schema= DATABASE() AND t.table_name= ?;", xormTable)
+	type PK struct {
+		ColumnName string
+	}
+	var pk PK
+	err = row.Scan(&pk.ColumnName)
+	fmt.Println(pk, err)
 
 	structStrArr := make([]string, 0, 0)
 	for columns.Next() {
@@ -83,7 +91,14 @@ func initTableStruct(mysqlDb *sql.DB) {
 		if !ok {
 			_type = "[]byte"
 		}
-		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s\"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, defaultValueString, comment)
+
+		//主键
+		pkString := ""
+		if columnName == pk.ColumnName {
+			pkString = "pk"
+		}
+		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s %s\"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, pkString, defaultValueString, comment)
+
 		structStrArr = append(structStrArr, rowXorm)
 	}
 	saveToFile(xormTable, structStrArr)
