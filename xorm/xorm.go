@@ -95,9 +95,9 @@ func initTableStruct(mysqlDb *sql.DB) {
 		//主键
 		pkString := ""
 		if columnName == pk.ColumnName {
-			pkString = "pk"
+			pkString = "pk autoincr"
 		}
-		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s %s\"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, pkString, defaultValueString, comment)
+		rowXorm := fmt.Sprintf("	%s %s `json:\"%s\" xorm:\"%s %s %s %s %s %s \"` \n", upperCamelCase(columnName), _type, columnName, "'"+columnName+"'", columnType, null, pkString, defaultValueString, comment)
 
 		structStrArr = append(structStrArr, rowXorm)
 	}
