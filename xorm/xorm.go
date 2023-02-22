@@ -13,7 +13,7 @@ var xormTable string
 
 func InitStruct(xormDsn string, table string) {
 	xormTable = table
-	//用系统orm，这样可以兼容以后的gorm等
+	// 用系统orm，这样可以兼容以后的gorm等
 	mysqlDb, err := CreateMysqlDb(xormDsn)
 	if err != nil {
 		fmt.Println(err)
@@ -21,10 +21,10 @@ func InitStruct(xormDsn string, table string) {
 	}
 	defer mysqlDb.Close()
 	if len(xormTable) > 0 {
-		//生成单表
+		// 生成单表
 		initTableStruct(mysqlDb)
 	} else {
-		//生成整个数据库
+		// 生成整个数据库
 		tables, err := mysqlDb.Query("SELECT table_name FROM information_schema.TABLES WHERE table_schema=DATABASE () AND table_type='BASE TABLE'; ")
 		if err != nil {
 			fmt.Println(err)
@@ -45,7 +45,7 @@ func InitStruct(xormDsn string, table string) {
 }
 
 func initTableStruct(mysqlDb *sql.DB) {
-	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE ,COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=?;", xormTable)
+	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE ,COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=? order by ordinal_position;", xormTable)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -92,7 +92,7 @@ func initTableStruct(mysqlDb *sql.DB) {
 			_type = "[]byte"
 		}
 
-		//主键
+		// 主键
 		pkString := ""
 		if columnName == pk.ColumnName {
 			pkString = "pk autoincr"
@@ -104,7 +104,7 @@ func initTableStruct(mysqlDb *sql.DB) {
 	saveToFile(xormTable, structStrArr)
 }
 
-//map for converting mysql type to golang types
+// map for converting mysql type to golang types
 var typeForMysqlToGo = map[string]string{
 	"int":                "int64",
 	"integer":            "int64",
