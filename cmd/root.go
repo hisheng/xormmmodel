@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/hisheng/xormmodel/xorm"
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"os"
 	"strings"
+
+	"github.com/hisheng/xormmodel/xorm"
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -30,6 +31,7 @@ var rootCmd = &cobra.Command{
 		initXormDbTable(args)
 		if xormDb == "" {
 			xormHelp(cmd)
+			xorm.InitXormModelConfig()
 			return
 		}
 		//2、获取dsn值
@@ -95,7 +97,7 @@ func xormHelp(cmd *cobra.Command) {
 	cmd.Println("\033[;36m 支持下面几种方式的cmd执行 \033[0m")
 	cmd.Println("xormmodel database")
 	cmd.Println("xormmodel database/table")
-	cmd.Println("xormmodel database/table -c '/user/local/.../debug/config/mysql.yaml'")
+	cmd.Println("xormmodel database/table -c 'xorm_model.yaml'")
 	cmd.Println("xormmodel database/table -d 'user:password@tcp(127.0.0.1:3306)/database?charset=utf8mb4'")
 }
 

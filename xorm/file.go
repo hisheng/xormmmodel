@@ -2,12 +2,13 @@ package xorm
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // 把字符串写入到文件中 类似于php file_put_contents
@@ -49,13 +50,17 @@ func saveToFile(tableName string, structStrArr []string) {
 	tbStr := fmt.Sprintf("func (m *%s) TableName() string { \n return \"%s\" \n }\n", upperCamelCase(tableName), tableName)
 	// fmt.Println(fileStr)
 	fileStr += tbStr
-	saveFile(tableName, fileStr)
-
+	saveTableFile(tableName, fileStr)
 }
 
-func saveFile(tableName, fileStr string) error {
+func saveTableFile(tableName, fileStr string) error {
+	fileName := tableName + ".go"
+	return saveFile(fileName, fileStr)
+}
+
+func saveFile(fileName, fileStr string) error {
 	savePath, _ := filepath.Abs("")
-	filePath := savePath + "/" + tableName + ".go"
+	filePath := savePath + "/" + fileName
 	fmt.Println("生成完成 " + filePath)
 	err := filePutContents(filePath, fileStr)
 	if err != nil {
@@ -127,5 +132,13 @@ func ConfigFilePath() string {
 		}
 	}
 	path += "/configs/config.yaml"
+	fmt.Println("寻找到config.yaml位置为", path)
 	return path
+}
+func InitXormModelConfig() error {
+	fmt.Println("xorm_model.yaml")
+	fileName := "xorm_model.yaml"
+	fileStr := "default:\n"
+	fileStr += fmt.Sprintf("  dsn: \"user:password@tcp(127.0.0.1:3306)/table?charset=utf8\"")
+	return saveFile(fileName, fileStr)
 }
