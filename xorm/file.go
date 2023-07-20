@@ -2,12 +2,13 @@ package xorm
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/yaml.v3"
 )
 
 // 把字符串写入到文件中 类似于php file_put_contents
@@ -33,11 +34,12 @@ func FileExists(path string) bool {
 	return true
 }
 
-func saveToFile(tableName string, structStrArr []string) {
+func saveToFile(tableName string, tableComment string, structStrArr []string) {
 	abs, _ := filepath.Abs("")
 	packageName := filepath.Base(abs)
 	importStr := ""
 	fileStr := "package " + packageName + "\n" + importStr + "\n"
+	fileStr += "// " + upperCamelCase(tableName) + " " + tableComment + "\n"
 	structStr := "type " + upperCamelCase(tableName) + " struct { \n"
 	for _, row := range structStrArr {
 		structStr += row

@@ -6,6 +6,7 @@ package xorm
 import (
 	"database/sql"
 	"fmt"
+
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -45,6 +46,14 @@ func InitStruct(xormDsn string, table string) {
 }
 
 func initTableStruct(mysqlDb *sql.DB) {
+	type TC struct {
+		TableComment string
+	}
+	tableComment := mysqlDb.QueryRow("SELECT table_comment FROM information_schema.TABLES  WHERE table_schema=DATABASE() AND table_name= ?", xormTable)
+	var tc TC
+	err := tableComment.Scan(&tc.TableComment)
+	fmt.Println(tc, err)
+
 	columns, err := mysqlDb.Query("SELECT COLUMN_NAME,DATA_TYPE,IS_NULLABLE,TABLE_NAME,COLUMN_COMMENT,COLUMN_TYPE ,COLUMN_DEFAULT FROM information_schema.COLUMNS WHERE table_schema=DATABASE() AND table_name=? order by ordinal_position;", xormTable)
 	if err != nil {
 		fmt.Println(err)
@@ -101,7 +110,7 @@ func initTableStruct(mysqlDb *sql.DB) {
 
 		structStrArr = append(structStrArr, rowXorm)
 	}
-	saveToFile(xormTable, structStrArr)
+	saveToFile(xormTable, tc.TableComment, structStrArr)
 }
 
 // map for converting mysql type to golang types
