@@ -84,6 +84,12 @@ type YamlFile struct {
 			Driver string
 			Source string
 		}
+		Mysql struct {
+			Default struct {
+				Driver string
+				Dsn    string
+			}
+		}
 	}
 }
 

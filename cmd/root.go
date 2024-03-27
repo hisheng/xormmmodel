@@ -2,12 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/hisheng/xormmodel/xorm"
-	homedir "github.com/mitchellh/go-homedir"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"os"
 	"strings"
+
+	"github.com/hisheng/xormmodel/xorm"
+	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var cfgFile string
@@ -26,19 +27,19 @@ var rootCmd = &cobra.Command{
 	Long:  `xormmodel database/table`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(args)
-		//1、获取database 与 table 值
+		// 1、获取database 与 table 值
 		initXormDbTable(args)
 		if xormDb == "" {
 			xormHelp(cmd)
 			return
 		}
-		//2、获取dsn值
+		// 2、获取dsn值
 		xormDsn = initXormDsn()
 		if xormDsn == "" {
 			fmt.Println("未找到dsn配置")
 			return
 		}
-		////3.生成struct文件
+		// //3.生成struct文件
 		xorm.InitStruct(xormDsn, xormTable)
 	},
 }
@@ -100,13 +101,13 @@ func xormHelp(cmd *cobra.Command) {
 }
 
 func initXormDsn() string {
-	//1、 -d 获取dsn方式
+	// 1、 -d 获取dsn方式
 	if len(xormDsn) > 0 {
 		return xormDsn
 	}
-	//2、-c 获取config 这个指定的优先级高于自动获取
+	// 2、-c 获取config 这个指定的优先级高于自动获取
 	if len(xormConfigPath) == 0 {
-		//3、通过appDir 自动寻找 config文件
+		// 3、通过appDir 自动寻找 config文件
 		xormConfigPath = xorm.ConfigFilePath()
 	}
 
@@ -118,5 +119,10 @@ func getDnsFromConfig(filePath string) string {
 	if xorm.FileExists(filePath) {
 		Config = xorm.ReadYamlFile(filePath)
 	}
-	return Config.Data.Database.Source
+	dsn := Config.Data.Database.Source
+	if len(dsn) == 0 {
+		dsn = Config.Data.Mysql.Default.Dsn
+	}
+	fmt.Println(dsn)
+	return dsn
 }
