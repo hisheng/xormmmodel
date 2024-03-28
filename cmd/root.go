@@ -106,19 +106,31 @@ func initXormDsn() string {
 		return xormDsn
 	}
 	// 2、-c 获取config 这个指定的优先级高于自动获取
+	var dsn string
 	if len(xormConfigPath) == 0 {
-		// 3、通过appDir 自动寻找 config文件
-		xormConfigPath = xorm.ConfigFilePath()
-	}
-
-	dsn := getDnsFromConfig(xormConfigPath)
-	if dsn != "" {
+		// 从xorm_model.yaml读取
 		xormModelFith := xorm.XormModelFilePath()
 		if !xorm.FileExists(xormModelFith) {
+			// 3、通过appDir 自动寻找 config文件
+			xormConfigPath = xorm.ConfigFilePath()
 			// 写一个默认配置文件
-			xorm.SaveXormModelFile(xormModelFith, dsn)
+			dsn = getDnsFromConfig(xormConfigPath)
+			if dsn != "" {
+				xorm.SaveXormModelFile(xormModelFith, dsn)
+			}
+		}
+		dsn = getDnsFromConfig(xormModelFith)
+		if dsn == "" {
+			// 3、通过appDir 自动寻找 config文件
+			xormConfigPath = xorm.ConfigFilePath()
+			// 写一个默认配置文件
+			dsn = getDnsFromConfig(xormConfigPath)
+			if dsn != "" {
+				xorm.SaveXormModelFile(xormModelFith, dsn)
+			}
 		}
 	}
+
 	return dsn
 }
 
@@ -127,8 +139,12 @@ func getDnsFromConfig(filePath string) string {
 	if xorm.FileExists(filePath) {
 		Config = xorm.ReadYamlFile(filePath)
 	}
-	dsn := Config.Data.Database.Source
-	if len(dsn) == 0 {
+	dsn := Config.Dsn
+	if dsn == "" {
+		dsn = Config.Data.Database.Source
+	}
+
+	if dsn == "" {
 		dsn = Config.Data.Mysql.Default.Dsn
 	}
 	fmt.Println(dsn)

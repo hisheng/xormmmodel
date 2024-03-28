@@ -79,6 +79,7 @@ func upperCamelCase(s string) string {
 }
 
 type YamlFile struct {
+	Dsn  string
 	Data struct {
 		Database struct {
 			Driver string
