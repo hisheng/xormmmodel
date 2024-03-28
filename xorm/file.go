@@ -172,7 +172,7 @@ func XormModelFilePath() string {
 
 func SaveXormModelFile(filePath, dsn string) error {
 	fileStr := "driver: mysql\n"
-	fileStr += fmt.Sprintf("dsn: %s\n", dsn)
+	fileStr += fmt.Sprintf("dsn: \"%s\"\n", dsn)
 	fmt.Println("生成完成 " + filePath)
 	err := filePutContents(filePath, fileStr)
 	if err != nil {
