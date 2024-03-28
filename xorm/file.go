@@ -137,3 +137,48 @@ func ConfigFilePath() string {
 	path += "/configs/config.yaml"
 	return path
 }
+
+func XormModelFilePath() string {
+	wd, _ := os.Getwd()
+	part := strings.Split(wd, "/")
+	path := ""
+	arrivalProjPath := false
+	for _, p := range part {
+		if p == "" {
+			continue
+		}
+		path += "/" + p
+		if arrivalProjPath {
+			break
+		}
+		if p == "api-ad.qmniu.com" {
+			arrivalProjPath = true
+			break
+		}
+
+		if p == "pixiu-ads-server" {
+			arrivalProjPath = true
+			break
+		}
+
+		if p == "pixiu-ad-backend" {
+			arrivalProjPath = true
+			break
+		}
+	}
+	path += "/xorm_model.yaml"
+	return path
+}
+
+func SaveXormModelFile(filePath, dsn string) error {
+	fileStr := "driver: mysql\n"
+	fileStr += fmt.Sprintf("dsn: %s\n", dsn)
+	fmt.Println("生成完成 " + filePath)
+	err := filePutContents(filePath, fileStr)
+	if err != nil {
+		return err
+	}
+	cmd := exec.Command("gofmt", "-w", filePath)
+	cmd.Run()
+	return nil
+}

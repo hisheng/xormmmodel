@@ -111,7 +111,15 @@ func initXormDsn() string {
 		xormConfigPath = xorm.ConfigFilePath()
 	}
 
-	return getDnsFromConfig(xormConfigPath)
+	dsn := getDnsFromConfig(xormConfigPath)
+	if dsn != "" {
+		xormModelFith := xorm.XormModelFilePath()
+		if !xorm.FileExists(xormModelFith) {
+			// 写一个默认配置文件
+			xorm.SaveXormModelFile(xormModelFith, dsn)
+		}
+	}
+	return dsn
 }
 
 func getDnsFromConfig(filePath string) string {
