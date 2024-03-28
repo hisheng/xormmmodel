@@ -166,6 +166,14 @@ func XormModelFilePath() string {
 			arrivalProjPath = true
 			break
 		}
+		if p == "pixiu-ad-server" {
+			arrivalProjPath = true
+			break
+		}
+		if p == "pixiu-adx-server" {
+			arrivalProjPath = true
+			break
+		}
 	}
 	path += "/xorm_model.yaml"
 	return path
