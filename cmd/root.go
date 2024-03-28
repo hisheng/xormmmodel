@@ -96,13 +96,14 @@ func xormHelp(cmd *cobra.Command) {
 	cmd.Println("\033[;36m 支持下面几种方式的cmd执行 \033[0m")
 	cmd.Println("xormmodel database")
 	cmd.Println("xormmodel database/table")
-	cmd.Println("xormmodel database/table -c '/user/local/.../debug/config/mysql.yaml'")
 	cmd.Println("xormmodel database/table -d 'user:password@tcp(127.0.0.1:3306)/database?charset=utf8mb4'")
 }
 
 func initXormDsn() string {
 	// 1、 -d 获取dsn方式
 	if len(xormDsn) > 0 {
+		xormModelFith := xorm.XormModelFilePath()
+		xorm.SaveXormModelFile(xormModelFith, xormDsn)
 		return xormDsn
 	}
 	// 2、-c 获取config 这个指定的优先级高于自动获取
