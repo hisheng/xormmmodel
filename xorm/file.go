@@ -80,20 +80,23 @@ func upperCamelCase(s string) string {
 }
 
 type YamlFile struct {
-	Dsn  string
-	Data struct {
-		Database struct {
+	Driver string        `yaml:"driver,omitempty"`
+	Dsn    string        `yaml:"dsn,omitempty"`
+	Data   *DataYamlFile `yaml:"data,omitempty"`
+	Dbs    []DbYamlFile  `yaml:"dbs,omitempty"` // 支持多个db数据库
+}
+
+type DataYamlFile struct {
+	Database struct {
+		Driver string
+		Source string
+	}
+	Mysql struct {
+		Default struct {
 			Driver string
-			Source string
-		}
-		Mysql struct {
-			Default struct {
-				Driver string
-				Dsn    string
-			}
+			Dsn    string
 		}
 	}
-	Dbs []DbYamlFile // 支持多个db数据库
 }
 
 type DbYamlFile struct {
