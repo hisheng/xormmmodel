@@ -147,7 +147,7 @@ func getDnsFromConfig(filePath string) string {
 		// 写入到 dbs
 		var isInDBs bool
 		for _, d := range Config.Dbs {
-			if d.Dsn == dsn && d.Name == xormDb {
+			if d.Name == xormDb {
 				isInDBs = true
 			}
 		}
