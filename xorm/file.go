@@ -206,7 +206,5 @@ func SaveYamlFile(yamlFilePath string, y YamlFile) error {
 		return err
 	}
 	err = filePutContents(yamlFilePath, string(fileStr))
-	if err != nil {
-		return err
-	}
+	return err
 }
