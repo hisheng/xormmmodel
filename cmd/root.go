@@ -138,11 +138,21 @@ func getDnsFromConfig(filePath string) string {
 	if xorm.FileExists(filePath) {
 		Config = xorm.ReadYamlFile(filePath)
 	}
-	dsn := Config.Dsn
+	var dsn string
+	// 读取新的多个db
+	for _, db := range Config.Dbs {
+		if db.Name == xormDb {
+			dsn = db.Dsn
+		}
+	}
+
+	// 读取老的单个db
+	dsn = Config.Dsn
 	if dsn == "" {
 		dsn = Config.Data.Database.Source
 	}
 
+	// 从项目配置文件读取
 	if dsn == "" {
 		dsn = Config.Data.Mysql.Default.Dsn
 	}

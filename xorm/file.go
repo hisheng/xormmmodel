@@ -92,6 +92,12 @@ type YamlFile struct {
 			}
 		}
 	}
+	Dbs []DbYamlFile // 支持多个db数据库
+}
+
+type DbYamlFile struct {
+	Name string
+	Dsn  string
 }
 
 func ReadYamlFile(yamlFilePath string) YamlFile {
