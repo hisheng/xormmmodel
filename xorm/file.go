@@ -3,6 +3,7 @@ package xorm
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -196,4 +197,16 @@ func SaveXormModelFile(filePath, dsn string) error {
 	cmd := exec.Command("gofmt", "-w", filePath)
 	cmd.Run()
 	return nil
+}
+
+func SaveYamlFile(yamlFilePath string, y YamlFile) error {
+	fileStr, err := yaml.Marshal(&y)
+	if err != nil {
+		log.Fatalf("error: %v", err)
+		return err
+	}
+	err = filePutContents(yamlFilePath, string(fileStr))
+	if err != nil {
+		return err
+	}
 }

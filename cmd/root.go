@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -139,6 +140,27 @@ func getDnsFromConfig(filePath string) string {
 		Config = xorm.ReadYamlFile(filePath)
 	}
 	var dsn string
+	// 读取老的单个db
+	dsn = Config.Dsn
+	// 把文件更新成支持多条
+	if dsn != "" {
+		// 写入到 dbs
+		var isInDBs bool
+		for _, d := range Config.Dbs {
+			if d.Dsn == dsn {
+				isInDBs = true
+			}
+		}
+		if !isInDBs {
+			Config.Dbs = append(Config.Dbs, xorm.DbYamlFile{Name: xormDb, Dsn: dsn})
+			// 保存新的yaml文件
+			err := xorm.SaveYamlFile(filePath, Config)
+			if err != nil {
+				log.Println(err)
+			}
+		}
+	}
+
 	// 读取新的多个db
 	for _, db := range Config.Dbs {
 		if db.Name == xormDb {
@@ -146,8 +168,7 @@ func getDnsFromConfig(filePath string) string {
 		}
 	}
 
-	// 读取老的单个db
-	dsn = Config.Dsn
+	// 从项目配置文件读取
 	if dsn == "" {
 		dsn = Config.Data.Database.Source
 	}
